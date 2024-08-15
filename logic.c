@@ -73,9 +73,9 @@ const char* playerColor(int maxIndex) {
 
 void determineOrder(int startIndex) {
     printf("The order of a single round is ");
-    for (int i = 0; i < 4; i++) {  
+    for (int i = 0; i < 4; i++) {
         printf("%s ",playerColor((startIndex + i) % 4));
-    } 
+    }
     printf(".\n");
 }
 
