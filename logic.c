@@ -61,8 +61,8 @@ int firstPlayer(){
 
 }
 
-const char* playerColor(int maxIndex) {
-    switch (maxIndex) {
+const char* playerColor(int playerIndex) {
+    switch (playerIndex) {
         case 0: return "Red"; break;
         case 1: return "Green"; break;
         case 2: return "Yellow"; break;
@@ -79,3 +79,14 @@ void determineOrder(int startIndex) {
     printf(".\n");
 }
 
+//once a dice rolled the following message should be output
+void diceRollMessage(int playerIndex,int roll){
+    printf("%s player rolled %d",playerColor(playerIndex),roll);
+}
+
+void movePieceOut(Piece *piece, int roll){
+    if ((*piece).position == BASE && roll == 6) {
+    piece->position = START_X;
+    piece->isInPlay = 1;
+
+}
