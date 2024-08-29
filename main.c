@@ -63,37 +63,59 @@ int main(){
 
     };
 
-    for (int i = 0; i < 16; i++)
-    {
-            //roll the dice
-            int roll = diceValue();
-            //print the dice value and current player
-            diceRollMessage(currentPlayerIndex, roll);
-            
-            //move the player
-            switch (currentPlayerIndex) { 
-                case 0:
-                    movePlayer(&redPlayer.pieces[0], &redPlayer, roll, redPath, TOTAL_RUNNING_CELLS, 52);
-                    break;
-                case 1:
-                    movePlayer(&greenPlayer.pieces[0], &greenPlayer, roll, greenPath, TOTAL_RUNNING_CELLS, 57);
-                    break;
-                case 2:
-                    movePlayer(&yellowPlayer.pieces[0], &yellowPlayer, roll, yellowPath, TOTAL_RUNNING_CELLS, 62);
-                    break;
-                case 3:
-                    movePlayer(&bluePlayer.pieces[0], &bluePlayer, roll, bluePath, TOTAL_RUNNING_CELLS, 67);
-                    break;
-                default:
-                    printf("error\n");
-                    break;
+for (int i = 0; i < 10; i++) {
+
+    printf("__________Round %d___________\n", i);
+    for(int j = 0; j <4; j++) {
+        // Roll the dice
+        int roll = diceValue();
+        diceRollMessage(currentPlayerIndex, roll);
+
+        Player* currentPlayer;
+        int* currentPath;
+        int homeStraightIndex;
+        
+        switch (currentPlayerIndex) {
+            case 0:
+                currentPlayer = &redPlayer;
+                currentPath = redPath;
+                homeStraightIndex = 52;
+                break;
+            case 1:
+                currentPlayer = &greenPlayer;
+                currentPath = greenPath;
+                homeStraightIndex = 57;
+                break;
+            case 2:
+                currentPlayer = &yellowPlayer;
+                currentPath = yellowPath;
+                homeStraightIndex = 62;
+                break;
+            case 3:
+                currentPlayer = &bluePlayer;
+                currentPath = bluePath;
+                homeStraightIndex = 67;
+                break;
+            default:
+                printf("Error: Invalid player index.\n");
+                break;
+        }
+
+        // Move one piece based on some logic (here, move the first valid piece)
+        for (int j = 0; j < 4; j++) {
+            if (currentPlayer->pieces[j].isInPlay || (roll == 6 && currentPlayer->pieces[j].position == BASE)) {
+                movePlayer(&currentPlayer->pieces[j], currentPlayer, roll, currentPath, TOTAL_RUNNING_CELLS, homeStraightIndex);
+                break;  // Move only one piece per turn
             }
-            // If the roll was not 6, move to the next player
+        }
+
+        // If the roll was not 6, move to the next player
         if (roll != 6) {
             currentPlayerIndex = (currentPlayerIndex + 1) % 4;
         }
-    
-    printf("\n");
-    return 0;
+        
+        printf("\n");
     }
+}
+    return 0;
 }

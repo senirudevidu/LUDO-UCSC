@@ -156,24 +156,16 @@ void howManyPieces(Player *players){
 }
 
 void movePlayer(Piece *pieces, Player *players, int diceValue, int path[], int totalRunningCells, int homestraightIndex) {
-    /*
-    Generic player movement logic:
-    - path[]: The array containing the path for the player (e.g., redPath, yellowPath).
-    - totalRunningCells: The total number of cells in the player's path (e.g., 57).
-    - homeStartIndex: The index in the path array where the home straight begins (e.g., 52 for the redPath).
-    */
-
     // Logic to move a piece from base to start square 'X'
     if (diceValue == 6 && pieces->position == BASE) {
-        pieces->position = path[START_X];  // Move piece to the starting square (first index in path)
+        pieces->position = path[START_X];  // Move piece to the starting square
         pieces->isInPlay = 1;  // Mark the piece as active on the board
 
-        printf("%s player moves piece %c%d to the starting point.\n", playerColor(players->index), players->colour, (int)(pieces - players->pieces) + 1);
-
+        printf("%s player moves piece %c%d to the starting point.\n", 
+               playerColor(players->index), players->colour, (int)(pieces - players->pieces) + 1);
         
-        howManyPieces(players);
-
-        rollSeveralTimes(pieces);  // Player rolls again since they rolled a 6
+        howManyPieces(players);  // Additional functionality to count active pieces
+        rollSeveralTimes(pieces);  // Player rolls again if they rolled a 6
         return;
     }
 
@@ -182,7 +174,7 @@ void movePlayer(Piece *pieces, Player *players, int diceValue, int path[], int t
         int currentPositionIndex = pieces->position;
         int newPositionIndex = currentPositionIndex + diceValue;
 
-        // If the piece is within standard cells
+        // Standard cells movement
         if (currentPositionIndex < homestraightIndex) {
             if (newPositionIndex < homestraightIndex) {
                 // Normal movement within standard cells
@@ -191,11 +183,12 @@ void movePlayer(Piece *pieces, Player *players, int diceValue, int path[], int t
                        currentPositionIndex, newPositionIndex, diceValue);
                 pieces->position = newPositionIndex;
             } else {
+                // Move into home straight
+                int homeStraightPos = homestraightIndex + (newPositionIndex - homestraightIndex);
                 printf("%s player moves piece %c%d from location %d to %d by %d.\n",
                        playerColor(players->index), players->colour, (int)(pieces - players->pieces) + 1,
-                       currentPositionIndex, homestraightIndex + (newPositionIndex - homestraightIndex), diceValue);
-                // Piece moves from standard cells into the home straight
-                pieces->position = homestraightIndex + (newPositionIndex - homestraightIndex);
+                       currentPositionIndex, homeStraightPos, diceValue);
+                pieces->position = homeStraightPos;
             }
 
             // If the player rolls a 6, they get another turn
@@ -203,25 +196,27 @@ void movePlayer(Piece *pieces, Player *players, int diceValue, int path[], int t
                 rollSeveralTimes(pieces);
             }
         }
-        // If the piece is within the home straight
+        // Home straight movement
         else if (currentPositionIndex >= homestraightIndex && currentPositionIndex < totalRunningCells) {
             int toHome = totalRunningCells - currentPositionIndex - 1;
 
             if (diceValue == toHome) {
-                // Piece reaches home with an exact roll
+                // Exact roll to reach home
                 pieces->position = totalRunningCells - 1;
-                pieces->isInPlay = 0;  // Mark the piece as having reached home
-            printf("%s player moves piece %c%d to home.\n",
+                pieces->isInPlay = 0;  // Mark piece as home
+                printf("%s player moves piece %c%d to home.\n",
                        playerColor(players->index), players->colour, (int)(pieces - players->pieces) + 1);
-                // Additional logic for winning can be added here///////////////////////////////////////////////////////////////////////
+                // Add any winning logic here if required
             } else if (diceValue < toHome) {
+                // Move within the home straight
                 printf("%s player moves piece %c%d from location %d to %d by %d.\n",
                        playerColor(players->index), players->colour, (int)(pieces - players->pieces) + 1,
                        currentPositionIndex, newPositionIndex, diceValue);
-                // Move piece forward in the home straight
                 pieces->position = newPositionIndex;
             } else {
-                // hand over the dice to next player
+                // Overshoot - No movement allowed, hand over the turn to the next player
+                printf("%s player cannot move piece %c%d due to overshoot.\n",
+                       playerColor(players->index), players->colour, (int)(pieces - players->pieces) + 1);
             }
 
             // If the player rolls a 6, they get another turn
